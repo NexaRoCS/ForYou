@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="cs">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Valentýnka</title>
+    <style>
+      :root {
+        --bg-1: #ffdbe9;
+        --bg-2: #ffe8d4;
+        --glass: rgba(255, 255, 255, 0.22);
+        --glass-border: rgba(255, 255, 255, 0.4);
+        --text: #5f2f45;
+        --green: #34c373;
+        --green-dark: #1d9d5e;
+        --red: #f85d6d;
+        --red-dark: #d73849;
+        --shadow: rgba(165, 83, 108, 0.26);
+      }
+
+      * { box-sizing: border-box; }
+
+      html, body {
+        margin: 0;
+        min-height: 100%;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, var(--bg-1) 0%, #ffd6e6 32%, var(--bg-2) 100%);
+        color: var(--text);
+        overflow-x: hidden;
+      }
+
+      body {
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 22px 14px;
+        position: relative;
+      }
+
+      body::before,
+      body::after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(18px);
+        opacity: 0.55;
+        pointer-events: none;
+      }
+
+      body::before {
+        width: 190px;
+        height: 190px;
+        background: rgba(255,255,255,0.14);
+        top: 8%;
+        left: -40px;
+      }
+
+      body::after {
+        width: 220px;
+        height: 220px;
+        background: rgba(255, 182, 211, 0.2);
+        bottom: 6%;
+        right: -40px;
+      }
+
+      .card {
+        position: relative;
+        width: min(92vw, 420px);
+        max-width: 100%;
+        background: var(--glass);
+        border: 1px solid var(--glass-border);
+        border-radius: 30px;
+        box-shadow: 0 24px 54px var(--shadow), inset 0 1px 0 rgba(255,255,255,0.25);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        padding: 18px 16px 16px;
+        text-align: center;
+        overflow: hidden;
+      }
+
+      .card::before,
+      .card::after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.07);
+        pointer-events: none;
+        filter: blur(25px);
+      }
+
+      .card::before {
+        width: 170px;
+        height: 170px;
+        top: -30px;
+        left: -20px;
+      }
+
+      .card::after {
+        width: 200px;
+        height: 200px;
+        right: -36px;
+        bottom: -38px;
+      }
+
+      .heart-badge {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        font-size: 1.1rem;
+        opacity: 0.85;
+        z-index: 5;
+      }
+
+      .gif-wrap {
+        position: relative;
+        width: min(100%, 230px);
+        height: 180px;
+        max-height: 180px;
+        margin: 0 auto 18px;
+        border-radius: 22px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255,255,255,0.14);
+        border: 1px solid rgba(255,255,255,0.2);
+        box-shadow: inset 0 0 18px rgba(255,255,255,0.12);
+      }
+
+      .gif-wrap img {
+        width: 100%;
+        height: 100%;
+        max-height: 180px;
+        object-fit: contain;
+        object-position: center;
+        display: block;
+        background: rgba(255,255,255,0.1);
+      }
+
+      h1 {
+        margin: 0 0 18px;
+        font-size: clamp(2rem, 7vw, 2.8rem);
+        line-height: 1.1;
+        letter-spacing: -0.04em;
+      }
+
+      .button-row {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 12px;
+        width: min(100%, 300px);
+        max-width: 300px;
+        margin: 0 auto;
+        min-height: 64px;
+        transition: all 0.25s ease;
+        position: relative;
+        z-index: 3;
+      }
+
+      .btn {
+        border: none;
+        border-radius: 18px;
+        min-width: 120px;
+        min-height: 54px;
+        font-size: 1.04rem;
+        font-weight: 800;
+        color: white;
+        cursor: pointer;
+        box-shadow: 0 12px 24px rgba(0,0,0,0.12);
+        transition: transform 0.25s ease, box-shadow 0.25s ease, width 0.25s ease, height 0.25s ease, filter 0.25s ease;
+      }
+
+      .btn:active { transform: scale(0.98); }
+
+      .btn.yes {
+        background: linear-gradient(135deg, var(--green) 0%, var(--green-dark) 100%);
+      }
+
+      .btn.no {
+        background: linear-gradient(135deg, var(--red) 0%, var(--red-dark) 100%);
+      }
+
+      .btn:hover { filter: brightness(1.05); }
+
+      .button-row.hidden {
+        display: none;
+      }
+
+      .button-row.force-yes {
+        width: min(100%, 310px);
+      }
+
+      .btn.yes.force-yes {
+        width: 100%;
+        min-width: 0;
+        height: 68px;
+        font-size: clamp(1.4rem, 5vw, 2.3rem);
+        letter-spacing: 0.04em;
+      }
+
+      .planner {
+        display: none;
+        margin-top: 14px;
+        padding-top: 8px;
+        border-top: 1px solid rgba(255,255,255,0.25);
+        text-align: left;
+        position: relative;
+        z-index: 3;
+      }
+
+      .planner form {
+        width: 100%;
+      }
+
+      .planner.show {
+        display: block;
+        animation: fadeIn 0.35s ease;
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(8px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      .planner h2 {
+        margin: 0 0 12px;
+        text-align: center;
+        font-size: clamp(1.2rem, 4vw, 1.6rem);
+      }
+
+      .field {
+        display: block;
+        margin-bottom: 12px;
+      }
+
+      .field label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: 700;
+        font-size: 0.92rem;
+      }
+
+      .field select {
+        width: 100%;
+        border: 1px solid rgba(255,255,255,0.25);
+        border-radius: 14px;
+        background: rgba(255,255,255,0.2);
+        color: var(--text);
+        padding: 12px 14px;
+        font-size: 0.95rem;
+        outline: none;
+      }
+
+      .custom-input {
+        display: none;
+        margin-top: 8px;
+      }
+
+      .custom-input.show {
+        display: block;
+      }
+
+      .custom-input input,
+      .field textarea {
+        width: 100%;
+        border: 1px solid rgba(255,255,255,0.25);
+        border-radius: 14px;
+        background: rgba(255,255,255,0.2);
+        color: var(--text);
+        padding: 12px 14px;
+        font-size: 0.95rem;
+        outline: none;
+        resize: vertical;
+        min-height: 48px;
+      }
+
+      .field textarea {
+        min-height: 90px;
+      }
+
+      .submit-plan {
+        width: 100%;
+        margin-top: 10px;
+        background: linear-gradient(135deg, #ff7ab6 0%, #ff5d7e 100%);
+        color: white;
+        border: none;
+        border-radius: 16px;
+        min-height: 52px;
+        font-size: 1rem;
+        font-weight: 800;
+        cursor: pointer;
+        box-shadow: 0 12px 24px rgba(194, 72, 108, 0.25);
+      }
+
+      .hidden-audio {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        opacity: 0;
+        pointer-events: none;
+        overflow: hidden;
+      }
+
+      @media (max-width: 420px) {
+        .card {
+          padding: 16px 12px 14px;
+        }
+
+        .gif-wrap {
+          height: 160px;
+          max-height: 160px;
+        }
+
+        .gif-wrap img {
+          max-height: 160px;
+        }
+
+        .button-row {
+          gap: 10px;
+          width: min(100%, 290px);
+        }
+
+        .btn {
+          min-width: 110px;
+          min-height: 52px;
+          font-size: 1rem;
+        }
+      }
+
+      @media (max-width: 340px) {
+        .card {
+          width: min(94vw, 380px);
+        }
+
+        .btn {
+          min-width: 96px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="heart-badge" aria-hidden="true">💖💞</div>
+
+      <div class="gif-wrap">
+        <img id="mainImage" src="https://giphy.com" alt="Cute cat" />
+      </div>
+
+      <h1 id="question">Budeš moje Valentýnka? ❤️</h1>
+
+      <div class="button-row" id="buttonRow">
+        <button class="btn yes" id="yesBtn" type="button">ANO</button>
+        <button class="btn no" id="noBtn" type="button">NE</button>
+      </div>
+
+      <div class="planner" id="planner" aria-live="polite">
+        <h2>💌 Můj plán pro nás</h2>
+
+        <form id="dateForm" action="https://formspree.io/f/xppaojpk" method="POST">
+          <div class="field">
+            <label for="foodSelect">🍕 Co budeme jíst?</label>
+            <select id="foodSelect" name="Jídlo">
+              <option>Pizzu v pizzerii</option>
+              <option>Palačinky nebo vafle v cukrárně</option>
+              <option>Burger a hranolky</option>
+              <option>Sladké pečivo z pekárny</option>
+              <option value="custom">Napsat vlastní možnost...</option>
+            </select>
+            <div class="custom-input" id="foodCustomWrap">
+              <input type="text" id="foodCustom" name="Vlastní jídlo" placeholder="Napiš, na co máš chuť..." />
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="drinkSelect">🧋 Co si dáme k pití?</label>
+            <select id="drinkSelect" name="Tečka/Pití">
+              <option>Ovocné nebo mléčné Bubble Tea</option>
+              <option>Ovocné smoothie / koktejl</option>
+              <option>Horkou čokoládu se šlehačkou</option>
+              <option>Domácí limonádu s ovocem</option>
+              <option value="custom">Napsat vlastní možnost...</option>
+            </select>
+            <div class="custom-input" id="drinkCustomWrap">
+              <input type="text" id="drinkCustom" name="Vlastní tečka/pití" placeholder="Napiš svoji představu..." />
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="activitySelect">🍿 Hlavní aktivita:</label>
+            <select id="activitySelect" name="Aktivita">
+              <option>Kino a film</option>
+              <option>Herní zóna (Air hockey / arkády)</option>
+              <option>Trampolínové centrum</option>
+              <option>Procházka na vyhlídku a focení</option>
+              <option>Bowling</option>
+              <option value="custom">Napsat vlastní možnost...</option>
+            </select>
+            <div class="custom-input" id="activityCustomWrap">
+              <input type="text" id="activityCustom" name="Vlastní aktivita" placeholder="Napiš svoji představu..." />
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="daySelect">🗓️ Který den vyrazíme?</label>
+            <select id="daySelect" name="Den">
+              <option>Tento pátek</option>
+              <option>V sobotu</option>
+              <option>V neděli</option>
+              <option>Nechám se překvapit!</option>
+              <option value="custom">Napsat vlastní možnost...</option>
+            </select>
+            <div class="custom-input" id="dayCustomWrap">
+              <input type="text" id="dayCustom" name="Vlastní den" placeholder="Napiš svůj den..." />
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="timeSelect">🕒 V kolik hodin?</label>
+            <select id="timeSelect" name="Čas">
+              <option>Ve 14:00</option>
+              <option>V 16:00</option>
+              <option>V 18:00</option>
+              <option>Vyzvedneš mě, kdy chceš</option>
+              <option value="custom">Napsat vlastní možnost...</option>
+            </select>
+            <div class="custom-input" id="timeCustomWrap">
+              <input type="text" id="timeCustom" name="Vlastní čas" placeholder="Napiš svůj čas..." />
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="noteText">📝 Dobrovolná poznámka / vzkaz pro mě:</label>
+            <textarea id="noteText" name="Poznámka" placeholder="Můžeš mi sem cokoliv připsat..."></textarea>
+          </div>
+
+          <button class="submit-plan" id="sendPlanBtn" type="submit">Poslat moje plány! 🚀</button>
+        </form>
+      </div>
+    </div>
+
+    <audio id="bgMusic" class="hidden-audio" loop preload="auto" playsinline aria-hidden="true">
+      <source src="https://cdn.pixabay.com/download/audio/2023/01/18/audio_3006e138b1.mp3?filename=romantic-guitar-ambient-14131.mp3" type="audio/mpeg" />
+    </audio>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script>
+      const questionEl = document.getElementById('question');
+      const noBtn = document.getElementById('noBtn');
+      const yesBtn = document.getElementById('yesBtn');
+      const buttonRow = document.getElementById('buttonRow');
+      const planner = document.getElementById('planner');
+      const mainImage = document.getElementById('mainImage');
+      const bgMusic = document.getElementById('bgMusic');
+
+      const defaultGif = 'https://giphy.com';
+      const sadGif = 'https://giphy.com';
+      const happyGif = 'https://giphy.com';
+
+      const noTexts = [
+        'Jsi si jistá? 🥺',
+        'Opravdu ne? 💔',
+        'Znovu si to rozmysli! 😭',
+        'Dám ti poslední šanci...',
+        'Jen to zkoušíš, že jo? 😂'
+      ];
+
+      let tries = 0;
+      let accepted = false;
+      let audioStarted = false;
+
+      function fallbackImage() {
+        const svg = `
+          <svg xmlns='http://www.w3.org/2000/svg' width='600' height='600' viewBox='0 0 600 600'>
+            <defs>
+              <linearGradient id='g' x1='0' x2='1'>
+                <stop offset='0%' stop-color='#ffd7e7'/>
+                <stop offset='100%' stop-color='#ffe9d1'/>
+              </linearGradient>
+            </defs>
+            <rect width='600' height='600' rx='40' fill='url(#g)'/>
+            <text x='50%' y='52%' text-anchor='middle' font-size='260' dominant-baseline='middle'>💖</text>
+          </svg>
+        `;
+        mainImage.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+      }
+
+      function setImage(src) {
+        mainImage.onerror = fallbackImage;
+        mainImage.src = src;
+      }
+
+      function playMusic() {
+        if (audioStarted) return;
+        audioStarted = true;
+        bgMusic.volume = 0.22;
+        const playPromise = bgMusic.play();
+        if (playPromise && typeof playPromise.catch === 'function') {
+          playPromise.catch(() => {});
+        }
+      }
+
+      function triggerYesState() {
+        accepted = true;
+        buttonRow.classList.add('hidden');
+        questionEl.innerHTML = 'Jééé, věděl jsem to! <br> Miluju Tě! 🥰❤️';
+        setImage(happyGif);
+        planner.classList.add('show');
+
+        confetti({
+          particleCount: 220,
+          spread: 130,
+          startVelocity: 46,
+          origin: { y: 0.58 },
+          colors: ['#ff66b2', '#ffb3d9', '#ffdf6b', '#7fe7b5', '#9ad3ff']
+        });
+
+        setTimeout(() => {
+          confetti({
+            particleCount: 180,
+            spread: 100,
+            startVelocity: 34,
+            origin: { y: 0.72 },
+            colors: ['#ff7ca6', '#fdd76b', '#82dfb5', '#b7c4ff']
+          });
+        }, 180);
+      }
+
+      function setupCustomSelect(selectId, customWrapId, customInputId) {
+        const select = document.getElementById(selectId);
+        const customWrap = document.getElementById(customWrapId);
+        const customInput = document.getElementById(customInputId);
+
+        function toggleCustom() {
+          const isCustom = select.value === 'custom';
+          customWrap.classList.toggle('show', isCustom);
+          customInput.required = isCustom;
+          if (!isCustom) {
+            customInput.value = '';
+          }
+        }
+
+        select.addEventListener('change', toggleCustom);
+        toggleCustom();
+      }
+
+      setupCustomSelect('foodSelect', 'foodCustomWrap', 'foodCustom');
+      setupCustomSelect('drinkSelect', 'drinkCustomWrap', 'drinkCustom');
+      setupCustomSelect('activitySelect', 'activityCustomWrap', 'activityCustom');
+      setupCustomSelect('daySelect', 'dayCustomWrap', 'dayCustom');
+      setupCustomSelect('timeSelect', 'timeCustomWrap', 'timeCustom');
+
+      setImage(defaultGif);
+
+      noBtn.addEventListener('click', () => {
+        if (accepted) return;
+        playMusic();
+        tries += 1;
+
+        if (tries >= 6) {
+          noBtn.style.display = 'none';
+          yesBtn.classList.add('force-yes');
+          buttonRow.classList.add('force-yes');
+          noBtn.setAttribute('aria-hidden', 'true');
+          questionEl.textContent = 'Tak jsem si říkala, že to přece jenom bude ANO… 💖';
+          setImage(happyGif);
+          return;
+        }
+
+        const scaleValue = 1 + Math.min(tries * 0.22, 1.8);
+        yesBtn.style.transform = `scale(${scaleValue})`;
+        yesBtn.style.transition = 'transform 0.25s ease';
+        noBtn.textContent = noTexts[(tries - 1) % noTexts.length];
+        setImage(sadGif);
+      });
+
+      yesBtn.addEventListener('click', () => {
+        if (accepted) return;
+        playMusic();
+        triggerYesState();
+      });
+
+      document.getElementById('dateForm').addEventListener('submit', (event) => {
+        event.preventDefault();
+
+        const getSelectedOrCustom = (selectId, customId) => {
+          const select = document.getElementById(selectId);
+          const customInput = document.getElementById(customId);
+          const value = select.value;
+          if (value === 'custom') {
+            return customInput.value.trim();
+          }
+          return value;
+        };
+
+        const food = getSelectedOrCustom('foodSelect', 'foodCustom');
+        const drink = getSelectedOrCustom('drinkSelect', 'drinkCustom');
+        const activity = getSelectedOrCustom('activitySelect', 'activityCustom');
+        const day = getSelectedOrCustom('daySelect', 'dayCustom');
+        const time = getSelectedOrCustom('timeSelect', 'timeCustom');
+        const note = document.getElementById('noteText').value.trim();
+
+        const message = [
+          '💌 Moje plánky pro náš den: ',
+          '🍕 Jídlo: ' + food,
+          '🧋 Pití / sladká tečka: ' + drink,
+          '🍿 Aktivita: ' + activity,
+          '🗓️ Den: ' + day,
+          '🕒 Čas: ' + time,
+          '📝 Poznámka: ' + (note || '—'),
+          '',
+          'Mám se na to těšit! 😍💘'
+        ].join('\n');
+
+        if (navigator.clipboard && window.isSecureContext) {
+          navigator.clipboard.writeText(message).catch(() => {});
+        }
+
+        const waLink = 'https://wa.me/?text=' + encodeURIComponent(message);
+        window.open(waLink, '_blank', 'noopener,noreferrer');
+
+        const form = event.currentTarget;
+        const formData = new FormData(form);
+
+        fetch(form.action, {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'Accept': 'application/json'
+          }
+        }).then((response) => {
+          if (response.ok) {
+            alert('Plán byl odeslán! ❤️');
+          } else {
+            alert('Plán se poslal do WhatsAppu a do schránky, ale Formspree neodeslal.');
+          }
+        }).catch(() => {
+          alert('Plán byl zkopírován a otevřen ve WhatsAppu.');
+        });
+      });
+    </script>
+  </body>
+</html>
